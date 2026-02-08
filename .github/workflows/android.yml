@@ -23,3 +23,30 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew build
+    - name: Assemble debug APK
+      run: ./gradlew assembleDebug
+    - name: Assemble release APK
+      run: ./gradlew assembleRelease
+    - name: Upload APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk-debug
+        path: |
+          androidApp/build/outputs/apk/debug/*.apk
+        if-no-files-found: error
+    - name: Upload release APK artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-apk-release
+        path: |
+          androidApp/build/outputs/apk/release/*.apk
+        if-no-files-found: error
+    - name: Upload build reports
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: gradle-reports
+        path: |
+          **/build/reports/**
+          **/build/test-results/**
+        if-no-files-found: warn
