@@ -1,2 +1,16 @@
 .idea
-.gradle
+
+
+# Gradle
+.gradle/
+**/build/
+
+# Local SDK path
+local.properties
+
+# IntelliJ / Android Studio
+.idea/
+*.iml
+
+# OS/editor noise
+.DS_Store
