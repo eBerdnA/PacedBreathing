@@ -39,6 +39,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,6 +67,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.beansys.breathing.shared.BreathingDefaults
 import com.beansys.breathing.shared.Preset
+import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -140,8 +142,8 @@ private fun BreathingScreen() {
 
     var isRunning by rememberSaveable { mutableStateOf(false) }
     var phaseIndex by rememberSaveable { mutableIntStateOf(0) }
-    var phaseElapsed by rememberSaveable { mutableStateOf(0.0) }
-    var remainingCountdown by rememberSaveable { mutableStateOf(settings.countdownMinutes * 60.0) }
+    var phaseElapsed by rememberSaveable { mutableDoubleStateOf(0.0) }
+    var remainingCountdown by rememberSaveable { mutableDoubleStateOf(settings.countdownMinutes * 60.0) }
     var didCompleteCountdown by rememberSaveable { mutableStateOf(false) }
     var shouldFinishCycle by rememberSaveable { mutableStateOf(false) }
 
@@ -325,7 +327,7 @@ private fun BreathingScreen() {
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 Text(
-                    text = String.format("%.1f breaths/min", breathsPerMinute),
+                    text = String.format(Locale.getDefault(), "%.1f breaths/min", breathsPerMinute),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color.White,
@@ -619,7 +621,7 @@ private fun DurationRow(
         ) {
             Text(title, color = Color.White, fontWeight = FontWeight.SemiBold)
             Spacer(modifier = Modifier.weight(1f))
-            Text(String.format("%.1f%s", value, unit), color = Color.White.copy(alpha = 0.7f))
+            Text(String.format(Locale.getDefault(), "%.1f%s", value, unit), color = Color.White.copy(alpha = 0.7f))
         }
         val steps = ((range.endInclusive - range.start) / 0.5).toInt() - 1
         Slider(
@@ -637,7 +639,7 @@ private fun formatCountdown(seconds: Double): String {
     val totalSeconds = max(seconds, 0.0).toInt()
     val minutes = totalSeconds / 60
     val remaining = totalSeconds % 60
-    return String.format("%02d:%02d", minutes, remaining)
+    return String.format(Locale.getDefault(), "%02d:%02d", minutes, remaining)
 }
 
 private fun advancePhase(

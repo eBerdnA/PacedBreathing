@@ -3,6 +3,7 @@ package com.beansys.breathing
 import android.media.AudioAttributes
 import android.media.AudioFormat
 import android.media.AudioTrack
+import java.util.Locale
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.round
@@ -128,7 +129,7 @@ class SoundPlayer {
 
     private fun cacheKey(start: Double, end: Double, duration: Double): String {
         val rounded = round(duration * 2) / 2
-        return String.format("%.1f-%.1f-%.1f", start, end, rounded)
+        return String.format(Locale.US, "%.1f-%.1f-%.1f", start, end, rounded)
     }
 
     private fun cacheBuffer(key: String, buffer: ShortArray) {
