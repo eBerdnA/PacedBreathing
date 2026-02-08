@@ -35,6 +35,7 @@ android {
 
     lint {
         disable += "IconLauncherShape"
+        disable += "MonochromeLauncherIcon"
     }
 }
 
