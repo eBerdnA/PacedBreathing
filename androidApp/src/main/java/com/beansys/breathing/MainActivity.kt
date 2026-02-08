@@ -39,6 +39,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -141,8 +142,8 @@ private fun BreathingScreen() {
 
     var isRunning by rememberSaveable { mutableStateOf(false) }
     var phaseIndex by rememberSaveable { mutableIntStateOf(0) }
-    var phaseElapsed by rememberSaveable { mutableStateOf(0.0) }
-    var remainingCountdown by rememberSaveable { mutableStateOf(settings.countdownMinutes * 60.0) }
+    var phaseElapsed by rememberSaveable { mutableDoubleStateOf(0.0) }
+    var remainingCountdown by rememberSaveable { mutableDoubleStateOf(settings.countdownMinutes * 60.0) }
     var didCompleteCountdown by rememberSaveable { mutableStateOf(false) }
     var shouldFinishCycle by rememberSaveable { mutableStateOf(false) }
 
