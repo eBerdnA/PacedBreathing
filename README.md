@@ -18,3 +18,7 @@ Opinionated paced breathing app. Only tested for Android 16 (API 36).
 </a>
 
 <br />[APK Download](https://github.com/eBerdnA/PacedBreathing/releases/latest)
+
+## License
+
+MIT License - see [LICENSE](LICENSE)
