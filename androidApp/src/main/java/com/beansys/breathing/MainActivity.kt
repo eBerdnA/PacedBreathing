@@ -492,7 +492,7 @@ private fun BreathingScreen() {
                 DurationRow(
                     title = "Session (min)",
                     value = settings.countdownMinutes,
-                    range = 0.0..30.0,
+                    range = 0.0..15.0,
                     unit = "min",
                     onValueChange = { newValue ->
                         scope.launch {
