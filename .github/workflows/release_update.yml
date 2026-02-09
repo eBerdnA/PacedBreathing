@@ -30,21 +30,23 @@ jobs:
           java-version: 21
       - uses: gradle/actions/setup-gradle@v5
       - name: Prepare Android signing files
-        if: github.repository_owner == 'eBerdnA'
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          if [ ! -z "${{ secrets.KEYSTORE }}" ]; then
-            echo storePassword='${{ secrets.KEYSTORE_PASSWORD }}' >> keystore.properties
-            echo keyAlias='${{ secrets.KEY_ALIAS }}' >> keystore.properties
-            echo keyPassword='${{ secrets.KEY_PASSWORD }}' >> keystore.properties
-            echo storeFile='${{ github.workspace }}/key.jks' >> keystore.properties
-            echo ${{ secrets.KEYSTORE }} | base64 --decode > ${{ github.workspace }}/key.jks
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && [ -n "$ANDROID_KEY_ALIAS" ]; then
+            KEY_PASSWORD="${ANDROID_KEY_PASSWORD:-$ANDROID_KEYSTORE_PASSWORD}"
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > key.jks
+            {
+              echo "storeFile=key.jks"
+              echo "storePassword=$ANDROID_KEYSTORE_PASSWORD"
+              echo "keyAlias=$ANDROID_KEY_ALIAS"
+              echo "keyPassword=$KEY_PASSWORD"
+            } > key.properties
           else
-            echo "Missing secret KEYSTORE. Failing build."
+            echo "Missing required signing secrets. Expected ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS."
             exit 1
           fi
       - name: Build release APK
