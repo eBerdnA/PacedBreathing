@@ -7,6 +7,9 @@
 
 # Local SDK path
 local.properties
+key.properties
+androidApp/*.jks
+androidApp/*.keystore
 
 # IntelliJ / Android Studio
 .idea/

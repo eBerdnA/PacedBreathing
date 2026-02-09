@@ -1,4 +1,47 @@
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.gradle.api.GradleException
+import java.io.FileInputStream
+import java.util.Properties
+
+val keystorePropertiesFile = rootProject.file("key.properties")
+val keystoreProperties = Properties()
+val hasReleaseSigning = keystorePropertiesFile.exists()
+val isReleaseTaskRequested = gradle.startParameter.taskNames.any { it.contains("Release", ignoreCase = true) }
+val requiredSigningKeys = listOf("storeFile", "storePassword", "keyAlias")
+
+if (hasReleaseSigning) {
+    FileInputStream(keystorePropertiesFile).use { keystoreProperties.load(it) }
+}
+
+fun propertyValue(key: String): String? {
+    val directValue = keystoreProperties.getProperty(key)?.trim()
+    if (!directValue.isNullOrEmpty()) return directValue
+
+    return keystoreProperties.stringPropertyNames()
+        .firstOrNull { it.equals(key, ignoreCase = true) }
+        ?.let { keystoreProperties.getProperty(it)?.trim() }
+        ?.takeIf { it.isNotEmpty() }
+}
+
+val missingSigningKeys = if (hasReleaseSigning) {
+    requiredSigningKeys.filter { propertyValue(it) == null }
+} else {
+    emptyList()
+}
+
+if (isReleaseTaskRequested && !hasReleaseSigning) {
+    throw GradleException(
+        "Missing key.properties for release signing. " +
+            "Create key.properties in the repo root (or provide it in CI) before running release builds."
+    )
+}
+
+if (isReleaseTaskRequested && missingSigningKeys.isNotEmpty()) {
+    throw GradleException(
+        "Missing required key.properties entries: ${missingSigningKeys.joinToString(", ")}. " +
+            "Required keys: ${requiredSigningKeys.joinToString(", ")}."
+    )
+}
 
 plugins {
     id("com.android.application")
@@ -36,6 +79,25 @@ android {
     lint {
         disable += "IconLauncherShape"
         disable += "MonochromeLauncherIcon"
+    }
+
+    signingConfigs {
+        create("release") {
+            if (hasReleaseSigning && missingSigningKeys.isEmpty()) {
+                storeFile = rootProject.file(propertyValue("storeFile")!!)
+                storePassword = propertyValue("storePassword")
+                keyAlias = propertyValue("keyAlias")
+                keyPassword = propertyValue("keyPassword") ?: propertyValue("storePassword")
+            }
+        }
+    }
+
+    buildTypes {
+        getByName("release") {
+            if (hasReleaseSigning && missingSigningKeys.isEmpty()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
+        }
     }
 }
 
